@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>Song Analyser</title>
+  <link rel="shortcut icon" href="{{ url_for('static',filename='img/note.png') }}" type="image/x-icon">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+  <!-- Google Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+  <!-- Material Design Bootstrap -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.16.0/css/mdb.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static',filename='css/style.css') }}">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <link href="{{ url_for('static',filename='vendor/fontawesome-free/css/all.css') }}" rel="stylesheet"
+    type="text/css">
+</head>
+
+<body style="background-image: url('https://dancingastro-wpengine.netdna-ssl.com/wp-content/uploads/2019/04/gesaffelstein-coachella-2019-julian-bajsel.jpg'); background-repeat: no-repeat; background-size: cover; background-position: center center;">
+  <!-- Main navigation -->
+
+    <!--Navbar-->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top scrolling-navbar">
+      <div class="container">
+        <a class="navbar-brand" href="/">
+          <i class="fas fa-music px-2"></i>
+          <strong> Song AI</strong></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent-7"
+          aria-controls="navbarSupportedContent-7" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <!-- <div class="collapse navbar-collapse" id="navbarSupportedContent-7">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+          </ul>
+          <form class="form-inline">
+            <div class="md-form my-0">
+              <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+            </div>
+          </form>
+        </div> -->
+      </div>
+    </nav>
+
+    <!-- Navbar -->
+
+
+  <div class="container pt-5">
+           <!--Grid row-->
+      <div class="row flex-nowrap bg-dark justify-content-center">
+        <div class="col-md-12 p-0">
+          <header class="jumbotron text-white bg-transparent py-4 align-items-center">
+            <img class="pb-3 img-fluid" src="{{song_data.song_image or song_data.artist_image }}" height="250px"
+              align="right" />
+            <h2><strong>{{song_data.title}}</strong></h2>
+            <h6><i>{{song_data.artist}}</i></h6>
+            <h6>{{song_data.album}} , Released {{song_data.year or 'Uknown'}} </h6>
+            <br/>
+            <iframe src="https://open.spotify.com/embed/track/{{song_data.spotify_id}}" width="300" height="80" frameborder="0"
+              allowtransparency="true" allow="encrypted-media"></iframe>
+          </header>
+        </div>
+
+      </div>
+
+
+
+      <div class="row bg-white flex-nowrap justify-content-center">
+        <!--Grid column-->
+        <div class="col-md-12 py-3 px-5">
+
+          
+          
+          
+
+          <div class="py-3 text-center text-uppercase text-dark mb-1">
+            <h2>Lyrics</h2>
+            <div class="divider-custom-icon">
+              <i class="fas fa-music"></i>
+              <i class="fas fa-music"></i>
+              <i class="fas fa-music"></i>
+            </div>
+          </div>
+
+
+          <p class="p-2">
+            {{song_data.lyrics}}
+          </p>
+
+          <hr class="star-dark mb-3">
+          <i class="fas fa-horizontal-rule"></i>
+
+          
+          <div class="py-3 text-center text-uppercase text-dark mb-1">
+            <h2>Analyses</h2>
+            <div class="divider-custom-icon">
+              <i class="fas fa-music"></i>
+              <i class="fas fa-music"></i>
+              <i class="fas fa-music"></i>
+            </div>
+          </div>
+
+          <br />
+            
+
+            <div class="card text-center">
+              <div class="card-header text-white bg-dark">
+                Word Count using NLP TextBlob
+              </div>
+              <div class="card-body">
+                <p class="card-text">
+                    <div id="bar-plot"></div>
+                </p>
+              </div>
+            </div>
+
+            <br />
+            
+            <script>
+                let trace = {
+                  x:  {{ bar_data["Word"] | safe }},
+                  y:  {{ bar_data["Count"] | safe }},
+                  type: 'bar',
+                  text: {{ bar_data["Word"] | safe }}
+                  
+                }
+
+                let chartData = [trace];
+                var config = { responsive: true }
+
+                let layout = {
+                  xaxis: { title: "Words" },
+                  yaxis: { title: "Frequency" }
+                }
+
+                Plotly.newPlot('bar-plot', chartData, layout, config);
+
+            </script>
+
+          <br />
+
+          <div class="card text-center">
+            <div class="card-header text-white bg-dark">
+              WordCloud using NLP TextBlob
+            </div>
+            <div class="card-body">
+              <p class="card-text">
+                <img class="img-fluid p-3" src="{{ url_for('static',filename='img/output/'+wordcloud_path) }}" height="500px" align="center" />
+                </p>
+            </div>
+          </div>
+
+          <br />
+
+          <div class="card text-center">
+            <div class="card-header text-white bg-dark">
+              NRC Word-Emotion Association Lexicon Scores
+            </div>
+            <div class="card-body">
+              <p class="card-text">
+                <div id="treemap"></div>
+              </p>
+            </div>
+            
+          </div>
+          
+              <script>
+                let labels = {{ nrc_sentiment["Sentiment"] | safe }}
+                let parents = ["", "", "", "", "", "", "", "", "", ""]
+                let data = [{
+                  type: "treemap",
+                  branchvalues: "total",
+                  labels: labels,
+                  parents: parents,
+                  values: {{ nrc_sentiment["Weight"] | safe }},
+                  textinfo: "label+value+percent",
+                  outsidetextfont: { "size": 20, "color": "#377eb8" },
+                  marker: { "line": { "width": 2 } },
+                  pathbar: { "visible": false }
+                }];
+                let layout1 = {}
+                Plotly.newPlot('treemap', data, layout1 , config)
+                </script>
+            
+              <br />
+                <div class="card text-center">
+                  <div class="card-header text-white bg-dark">
+                    Vader Sentiment Analysis
+                  </div>
+                  <div class="card-body">
+                    <p class="card-text">
+                    <div id="vader-plot"></div>
+                    </p>
+                  </div>
+                  <div class="card-footer text-muted text-left">
+                    <b>Words that can affect the sentiment scores:</b> {{ vader_sentiment["affinity_words"] | safe }} <br />
+                    <b>Compound Score:</b> {{ vader_sentiment["compound_score"] | safe }} , <i>Vader value that ranges from -1 as being negative, +1 as positive</i>
+                  </div>
+                </div>
+
+                <script>
+                  var trace2 = {
+                    labels: {{ vader_sentiment["Sentiment"] | safe }},
+                    values: {{ vader_sentiment["Weight"] | safe }},
+                    type: 'pie'
+                  };
+
+                  let data2 = [trace2];
+
+
+                  Plotly.newPlot("vader-plot", data2, layout1, config );
+                </script>
+
+
+                <br />
+                <div class="card text-center">
+                  <div class="card-header text-white bg-dark">
+                   Song Tags
+                  </div>
+                  <div class="card-body">
+                    <p class="card-text">
+                    {{song_tags}}
+                    </p>
+                  </div>
+                  <div class="card-footer text-muted text-left">
+                    Song tags fetched from LastFM
+                  </div>
+                </div>
+
+
+                <br />
+                <div class="card text-center">
+                  <div class="card-header text-white bg-dark">
+                    Music Genre Prediction using KNeighborsClassifier
+                  </div>
+                  <div class="card-body">
+                    <p class="card-text">
+                    Predicted Genre: {{artist_genre}}
+                    </p>
+                  </div>
+                  <div class="card-footer text-muted text-left">
+                    30% Accuracy
+                  </div>
+                </div>
+
+                <br />
+                <div class="card text-center">
+                  <div class="card-header text-white bg-dark">
+                    Song Image Analysis using Keras Xception
+                  </div>
+                  <div class="card-body">
+                    <p class="card-text">
+                      <img class="pb-3 img-fluid" src="{{song_data.song_image or song_data.artist_image }}" height="250px" align="center" />
+                    </p>
+                  </div>
+                  <div class="card-footer text-center">
+                    <table class="table px-3 table-hover table-striped table-sm table-dark">
+                      <thead>
+                        <tr>
+                          <th scope="col">Predicted Label</th>
+                          <th scope="col">Probability</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for dict_item in image_predictions %}
+                        <tr>
+                          {% for key, value in dict_item.items() %}
+                            <td>{{value}}</td>
+                            {% endfor %}
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                    
+
+                  </div>
+                </div>
+              
+
+        </div>
+      </div>
+    </div>
+    <!-- Full Page Intro -->
+
+  
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+  <!-- MDB core JavaScript -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.16.0/js/mdb.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.2.2/web-animations.min.js">
+  </script>
+  <script>
+    new WOW().init();
+  </script>
+</body>
+
+</html>
